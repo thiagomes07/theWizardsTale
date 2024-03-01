@@ -1,7 +1,3 @@
-const gameState = {
-	score: 0
-};
-
 const config = {
 	type: Phaser.AUTO,
 	width: 900,
@@ -17,4 +13,3 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-
