@@ -5,6 +5,7 @@ class GamePlay extends Phaser.Scene {
     this.wizard;
     this.velocityX = 200;
     this.velocityY = 200;
+    this.isCollecting = false;
 
     this.keyboard;
   }
@@ -43,7 +44,10 @@ class GamePlay extends Phaser.Scene {
 
     water.setCollisionByProperty({ collider: true });
 
-    this.wizard = this.physics.add.sprite(3150, 2100, "wizardWalk").setScale(1.25).setSize(40,60);
+    this.wizard = this.physics.add
+      .sprite(3150, 2100, "wizardWalk")
+      .setScale(1.25)
+      .setSize(40, 60);
 
     this.physics.add.collider(this.wizard, water);
 
@@ -81,7 +85,7 @@ class GamePlay extends Phaser.Scene {
 
     this.physics.world.setBounds(0, 0, 6300, 4200);
     this.cameras.main.setBounds(0, 0, 6300, 4200);
-    this.cameras.main.startFollow(this.wizard, true, .2, .2);
+    this.cameras.main.startFollow(this.wizard, true, 0.2, 0.2);
 
     this.keyboard = this.input.keyboard.createCursorKeys();
   }
@@ -90,35 +94,51 @@ class GamePlay extends Phaser.Scene {
     this.wizard.setVelocityX(0);
     this.wizard.setVelocityY(0);
 
+    // Movimento horizontal
     if (this.keyboard.right.isDown) {
       this.wizard.setFlipX(false);
-      this.wizard.anims.play("wizardWalk", true);
       this.wizard.setVelocityX(this.velocityX);
     } else if (this.keyboard.left.isDown) {
       this.wizard.setFlipX(true);
-      this.wizard.anims.play("wizardWalk", true);
       this.wizard.setVelocityX(-this.velocityX);
     }
 
+    // Movimento vertical
     if (this.keyboard.down.isDown) {
-      this.wizard.anims.play("wizardWalk", true);
       this.wizard.setVelocityY(this.velocityY);
     } else if (this.keyboard.up.isDown) {
-      this.wizard.anims.play("wizardWalk", true);
       this.wizard.setVelocityY(-this.velocityY);
     }
 
-    if (this.keyboard.space.isDown) {
+    // Verificar se há movimento horizontal ou vertical antes de iniciar a animação
+    const isMovingHorizontal =
+      this.keyboard.left.isDown || this.keyboard.right.isDown;
+    const isMovingVertical =
+      this.keyboard.up.isDown || this.keyboard.down.isDown;
+
+    if ((isMovingHorizontal || isMovingVertical) && !this.isCollecting) {
+      this.wizard.anims.play("wizardWalk", true);
+    } else if (!this.isCollecting) {
+      this.wizard.anims.play("wizardIdle", true);
+    }
+
+    // Lógica da animação de coleta
+    if (this.keyboard.space.isDown && !this.isCollecting) {
       this.wizard.anims.play("wizardCollect", true);
+      this.isCollecting = true;
+    }
+
+    // Verificar se a animação de coleta foi concluída
+    if (this.isCollecting && this.wizard.anims.currentAnim.key === "wizardCollect" && this.wizard.anims.isPlaying) {
       this.wizard.once(
         Phaser.Animations.Events.ANIMATION_COMPLETE,
-        function (animation, frame) {
+        function () {
+          console.log("asas");
+          this.isCollecting = false;
           this.wizard.anims.play("wizardIdle", true);
         },
         this
       );
-    } else if (this.wizard.anims.currentAnim.key != "wizardCollect") {
-      this.wizard.anims.play("wizardIdle", true);
     }
   }
 }
