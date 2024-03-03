@@ -5,13 +5,16 @@ class GamePlay extends Phaser.Scene {
     this.water;
 
     this.wizard;
-    this.velocityX = 1000;
-    this.velocityY = 1000;
+    this.velocityX = 200;
+    this.velocityY = 200;
     this.isCollecting = false;
 
     this.monsters;
-    
+
     this.coins;
+
+    this.score = 0;
+    this.scoreboard;
 
     this.keyboard;
   }
@@ -59,6 +62,8 @@ class GamePlay extends Phaser.Scene {
   }
 
   create() {
+    this.cameras.main.fadeIn(500, 0, 0, 0);
+
     const map = this.make.tilemap({ key: "map" });
     const tilesetGrass = map.addTilesetImage("grass", "grass");
     const tilesetWater = map.addTilesetImage("water", "water");
@@ -154,16 +159,22 @@ class GamePlay extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, 6300, 4200);
     this.cameras.main.startFollow(this.wizard, true, 0.2, 0.2);
 
-    this.keyboard = this.input.keyboard.createCursorKeys();
+    this.coins = this.physics.add.group();
+
+    this.physics.add.collider(this.coins, this.water);
 
     this.monsters = this.physics.add.group();
 
+    this.physics.add.collider(this.wizard, this.coins);
     this.physics.add.collider(this.monsters, this.water);
     this.physics.add.overlap(
       this.wizard,
       this.monsters,
       () => {
-        //colisão do mago com monstros
+        //overlap do mago com monstros
+        console.log("colidiu com monstro");
+        this.wizard.setTint(0xff0000);
+        //this.physics.pause();
       },
       null,
       this
@@ -171,7 +182,20 @@ class GamePlay extends Phaser.Scene {
 
     for (let i = 0; i < 250; i++) {
       this.createMonster();
+      this.createCoin();
     }
+
+    this.scoreboard = this.add.text(
+      this.cameras.main.scrollX + 30,
+      this.cameras.main.scrollY + 20,
+      "Pontos: " + this.score,
+      {
+        fontSize: "40px",
+        fill: "#fff",
+      }
+    );
+
+    this.keyboard = this.input.keyboard.createCursorKeys();
   }
 
   update() {
@@ -186,6 +210,9 @@ class GamePlay extends Phaser.Scene {
       if (monster.body.position.y <= 64) monster.setVelocityY(velocityY);
       if (monster.body.position.y >= 4125) monster.setVelocityY(-velocityY);
     });
+
+    this.scoreboard.setX(this.cameras.main.scrollX + 30); // reposiciona o texto horizontalmente para sempre acompanhar a câmera e não o mapa
+    this.scoreboard.setY(this.cameras.main.scrollY + 20); // reposiciona o texto verticalmente para sempre acompanhar a câmera e não o mapa
   }
 
   wizardMovement() {
@@ -224,6 +251,7 @@ class GamePlay extends Phaser.Scene {
     if (this.keyboard.space.isDown && !this.isCollecting) {
       this.wizard.anims.play("wizardCollect", true);
       this.isCollecting = true;
+      this.collectCoin();
     }
 
     // Verificar se a animação de coleta foi concluída
@@ -232,10 +260,11 @@ class GamePlay extends Phaser.Scene {
       this.wizard.anims.currentAnim.key === "wizardCollect" &&
       this.wizard.anims.isPlaying
     ) {
+      this.wizard.setOffset(20, 55);
       this.wizard.once(
         Phaser.Animations.Events.ANIMATION_COMPLETE,
-        function () {
-          console.log("asas");
+        () => {
+          this.wizard.setOffset(20, 8);
           this.isCollecting = false;
           this.wizard.anims.play("wizardIdle", true);
         },
@@ -244,8 +273,33 @@ class GamePlay extends Phaser.Scene {
     }
   }
 
-  collectCoin() {}
-  createCoin() {}
+  collectCoin() { // função chamada quando o mago coleta uma moeda
+    this.coins.children.iterate((coin) => {
+      if (
+        coin.body.position.x >= this.wizard.body.position.x - 75 &&
+        coin.body.position.x <= this.wizard.body.position.x + 75 &&
+        coin.body.position.y >= this.wizard.body.position.y - 75 &&
+        coin.body.position.y <= this.wizard.body.position.y + 100
+      ) {
+        coin.disableBody(true, true);
+        this.score+=10;
+        this.scoreboard.setText("Pontos: " + this.score)
+      }
+    });
+  }
+
+  createCoin() {
+    let positionX = Phaser.Math.Between(65, 6239);
+    let positionY = Phaser.Math.Between(65, 4159);
+
+    let coin = this.coins
+      .create(positionX, positionY, `coin`)
+      .setScale(0.15)
+      .setSize(100, 100)
+      .setDrag(500);
+
+    coin.anims.play("coin", true);
+  }
 
   createMonster() {
     let positionX = Phaser.Math.Between(65, 6239);
@@ -292,6 +346,26 @@ class GamePlay extends Phaser.Scene {
       this.monsters,
       () => {
         //mudar posição se monstro colidir com monstro
+        let collideVelocityX = Phaser.Math.Between(10, 50);
+        let collideVelocityY = Phaser.Math.Between(10, 50);
+
+        let collideIsNegativeX = Phaser.Math.Between(0, 1);
+        let collideIsNegativeY = Phaser.Math.Between(0, 1);
+
+        if (collideIsNegativeX) collideVelocityX *= -1;
+        if (collideIsNegativeY) collideVelocityY *= -1;
+
+        monster.setVelocityX(collideVelocityX).setVelocityY(collideVelocityY);
+      },
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      monster,
+      this.coins,
+      () => {
+        //mudar posição se monstro colidir com moeda
         let collideVelocityX = Phaser.Math.Between(10, 50);
         let collideVelocityY = Phaser.Math.Between(10, 50);
 
