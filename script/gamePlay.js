@@ -16,49 +16,51 @@ class GamePlay extends Phaser.Scene {
     this.score = 0;
     this.scoreboard;
 
+    this.isGameOver = false;
+
     this.keyboard;
   }
 
   preload() {
-    this.load.spritesheet("wizardIdle", "../assets/wizardIdle.png", {
+    this.load.spritesheet("wizardIdle", "../assets/scene2/wizardIdle.png", {
       frameWidth: 70,
       frameHeight: 70,
     });
 
-    this.load.spritesheet("wizardWalk", "../assets/wizardWalk.png", {
+    this.load.spritesheet("wizardWalk", "../assets/scene2/wizardWalk.png", {
       frameWidth: 70,
       frameHeight: 70,
     });
 
-    this.load.spritesheet("wizardCollect", "../assets/wizardCollect.png", {
+    this.load.spritesheet("wizardCollect", "../assets/scene2/wizardCollect.png", {
       frameWidth: 70,
       frameHeight: 166,
     });
 
-    this.load.spritesheet("coin", "../assets/coin.png", {
+    this.load.spritesheet("coin", "../assets/scene2/coin.png", {
       frameWidth: 200,
       frameHeight: 171,
     });
 
-    this.load.spritesheet("monsterIdle1", "../assets/monsterIdle1.png", {
+    this.load.spritesheet("monsterIdle1", "../assets/scene2/monsterIdle1.png", {
       frameWidth: 1422,
       frameHeight: 1131,
     });
 
-    this.load.spritesheet("monsterIdle2", "../assets/monsterIdle2.png", {
+    this.load.spritesheet("monsterIdle2", "../assets/scene2/monsterIdle2.png", {
       frameWidth: 805,
       frameHeight: 899,
     });
 
-    this.load.spritesheet("monsterIdle3", "../assets/monsterIdle3.png", {
+    this.load.spritesheet("monsterIdle3", "../assets/scene2/monsterIdle3.png", {
       frameWidth: 563,
       frameHeight: 681,
     });
 
-    this.load.image("grass", "../assets/wizardMap/grass.png");
-    this.load.image("water", "../assets/wizardMap/water.png");
-    this.load.image("flora", "../assets/wizardMap/flora.png");
-    this.load.tilemapTiledJSON("map", "../assets/wizardMap/map.json");
+    this.load.image("grass", "../assets/scene2/wizardMap/grass.png");
+    this.load.image("water", "../assets/scene2/wizardMap/water.png");
+    this.load.image("flora", "../assets/scene2/wizardMap/flora.png");
+    this.load.tilemapTiledJSON("map", "../assets/scene2/wizardMap/map.json");
   }
 
   create() {
@@ -172,9 +174,7 @@ class GamePlay extends Phaser.Scene {
       this.monsters,
       () => {
         //overlap do mago com monstros
-        console.log("colidiu com monstro");
-        this.wizard.setTint(0xff0000);
-        //this.physics.pause();
+        this.endGame();
       },
       null,
       this
@@ -199,7 +199,7 @@ class GamePlay extends Phaser.Scene {
   }
 
   update() {
-    this.wizardMovement();
+    if (!this.isGameOver) this.wizardMovement();
 
     this.monsters.children.iterate((monster) => {
       let velocityX = Phaser.Math.Between(10, 50);
@@ -213,6 +213,102 @@ class GamePlay extends Phaser.Scene {
 
     this.scoreboard.setX(this.cameras.main.scrollX + 30); // reposiciona o texto horizontalmente para sempre acompanhar a câmera e não o mapa
     this.scoreboard.setY(this.cameras.main.scrollY + 20); // reposiciona o texto verticalmente para sempre acompanhar a câmera e não o mapa
+  }
+
+  endGame() {
+    this.wizard.setTint(0xff0000);
+    this.score = 0;
+    this.isGameOver = true;
+    this.physics.pause();
+  }
+
+  collectCoin() {
+    // função chamada quando o mago coleta uma moeda
+    this.coins.children.iterate((coin) => {
+      if (
+        coin.body.position.x >= this.wizard.body.position.x - 75 &&
+        coin.body.position.x <= this.wizard.body.position.x + 75 &&
+        coin.body.position.y >= this.wizard.body.position.y - 75 &&
+        coin.body.position.y <= this.wizard.body.position.y + 100
+      ) {
+        coin.disableBody(true, true);
+        this.score += 10;
+        this.scoreboard.setText("Pontos: " + this.score);
+      }
+    });
+  }
+
+  restartGame() {
+    this.wizard.setTint(0xff0000);
+    this.score = 0;
+    this.isGameOver = true;
+    this.physics.pause();
+
+    this.monsters.children.iterate((monster) => {
+      monster.disableBody(true, true);
+    });
+
+    this.coins.children.iterate((coin) => {
+      coin.disableBody(true, true);
+    });
+
+    for (let i = 0; i < 250; i++) {
+      this.createMonster();
+      this.createCoin();
+    }
+  }
+
+  createCoin() {
+    let positionX = this.samePositionProtection().x;
+    let positionY = this.samePositionProtection().y;
+
+    let coin = this.coins
+      .create(positionX, positionY, `coin`)
+      .setScale(0.15)
+      .setSize(100, 100)
+      .setDrag(500);
+
+    coin.anims.play("coin", true);
+  }
+
+  samePositionProtection() {
+    let positionX = Phaser.Math.Between(65, 6239);
+    let positionY = Phaser.Math.Between(65, 4159);
+    let repeat = false;
+
+    //do { !!!!!!!!!!!!!VERIFICAR COM O PROFESSOR O PORQUÊ DESTE DO-WHILE NÃO FUNCIONAR!!!!!!!!!!!!!!!
+      this.monsters.children.iterate((monster) => {
+        while (
+          (positionX >= monster.body.position.x - 100 &&
+          positionX <= monster.body.position.x + 100 &&
+          positionY >= monster.body.position.y - 100 &&
+          positionY <= monster.body.position.y + 120) ||
+          (positionX >= this.wizard.body.position.x - 200 &&
+          positionX <= this.wizard.body.position.x + 200 &&
+          positionY >= this.wizard.body.position.y - 200 &&
+          positionY <= this.wizard.body.position.y + 220)
+        ) {
+          positionX = Phaser.Math.Between(65, 6239);
+          positionY = Phaser.Math.Between(65, 4159);
+        }
+      });
+
+      this.coins.children.iterate((coin) => {
+        if (
+          positionX >= coin.body.position.x - 100 &&
+          positionX <= coin.body.position.x + 100 &&
+          positionY >= coin.body.position.y - 100 &&
+          positionY <= coin.body.position.y + 120
+        ) {
+          repeat = true;
+          return false;
+        } else {
+          repeat = false;
+        }
+      });
+    //} while (repeat);
+
+    return { x: positionX, y: positionY };
   }
 
   wizardMovement() {
@@ -273,37 +369,9 @@ class GamePlay extends Phaser.Scene {
     }
   }
 
-  collectCoin() { // função chamada quando o mago coleta uma moeda
-    this.coins.children.iterate((coin) => {
-      if (
-        coin.body.position.x >= this.wizard.body.position.x - 75 &&
-        coin.body.position.x <= this.wizard.body.position.x + 75 &&
-        coin.body.position.y >= this.wizard.body.position.y - 75 &&
-        coin.body.position.y <= this.wizard.body.position.y + 100
-      ) {
-        coin.disableBody(true, true);
-        this.score+=10;
-        this.scoreboard.setText("Pontos: " + this.score)
-      }
-    });
-  }
-
-  createCoin() {
-    let positionX = Phaser.Math.Between(65, 6239);
-    let positionY = Phaser.Math.Between(65, 4159);
-
-    let coin = this.coins
-      .create(positionX, positionY, `coin`)
-      .setScale(0.15)
-      .setSize(100, 100)
-      .setDrag(500);
-
-    coin.anims.play("coin", true);
-  }
-
   createMonster() {
-    let positionX = Phaser.Math.Between(65, 6239);
-    let positionY = Phaser.Math.Between(65, 4159);
+    let positionX = this.samePositionProtection().x;
+    let positionY = this.samePositionProtection().y;
     let velocityX = Phaser.Math.Between(10, 50);
     let velocityY = Phaser.Math.Between(10, 50);
     let monsterId = Phaser.Math.Between(1, 3);
