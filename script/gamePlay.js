@@ -25,13 +25,13 @@ class GamePlay extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet("wizardIdle", "../assets/scene2/wizardIdle.png", {
+    this.load.spritesheet("wizardIdle", "assets/scene2/wizardIdle.png", {
       // mago respirando
       frameWidth: 70,
       frameHeight: 70,
     });
 
-    this.load.spritesheet("wizardWalk", "../assets/scene2/wizardWalk.png", {
+    this.load.spritesheet("wizardWalk", "assets/scene2/wizardWalk.png", {
       // mago andando
       frameWidth: 70,
       frameHeight: 70,
@@ -40,32 +40,32 @@ class GamePlay extends Phaser.Scene {
     this.load.spritesheet(
       // mago coletando moeda
       "wizardCollect",
-      "../assets/scene2/wizardCollect.png",
+      "assets/scene2/wizardCollect.png",
       {
         frameWidth: 70,
         frameHeight: 166,
       }
     );
 
-    this.load.spritesheet("coin", "../assets/scene2/coin.png", {
+    this.load.spritesheet("coin", "assets/scene2/coin.png", {
       // moeda
       frameWidth: 200,
       frameHeight: 171,
     });
 
-    this.load.spritesheet("monsterIdle1", "../assets/scene2/monsterIdle1.png", {
+    this.load.spritesheet("monsterIdle1", "assets/scene2/monsterIdle1.png", {
       // monstro 1
       frameWidth: 1422,
       frameHeight: 1131,
     });
 
-    this.load.spritesheet("monsterIdle2", "../assets/scene2/monsterIdle2.png", {
+    this.load.spritesheet("monsterIdle2", "assets/scene2/monsterIdle2.png", {
       // monstro 2
       frameWidth: 805,
       frameHeight: 899,
     });
 
-    this.load.spritesheet("monsterIdle3", "../assets/scene2/monsterIdle3.png", {
+    this.load.spritesheet("monsterIdle3", "assets/scene2/monsterIdle3.png", {
       // mosntro 3
       frameWidth: 563,
       frameHeight: 681,
