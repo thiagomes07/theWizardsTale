@@ -12,7 +12,7 @@ body {
   justify-content: center;
   align-items: center;
   margin: 0;
-  /* background: linear-gradient(to bottom, #2e1a47, #040b14); */
+  background: linear-gradient(to bottom, #260c3c, #1a0642);
 }
 
 div#wizardGame {
