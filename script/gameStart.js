@@ -4,10 +4,10 @@ class GameStart extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("background", "../assets/scene1/background.jpg"); // carrega o plano de fundo
-    this.load.image("gameTitle", "../assets/scene1/gameTitle.png"); // carrega o título do jogo
-    this.load.image("play", "../assets/scene1/play.png"); // carrega o botão de jogar
-    this.load.image("rulesText", "../assets/scene1/rulesText.png"); // carrega as regras do jogo
+    this.load.image("background", "assets/scene1/background.jpg"); // carrega o plano de fundo
+    this.load.image("gameTitle", "assets/scene1/gameTitle.png"); // carrega o título do jogo
+    this.load.image("play", "assets/scene1/play.png"); // carrega o botão de jogar
+    this.load.image("rulesText", "assets/scene1/rulesText.png"); // carrega as regras do jogo
   }
 
   create() {

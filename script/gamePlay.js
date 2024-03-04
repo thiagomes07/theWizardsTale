@@ -71,14 +71,14 @@ class GamePlay extends Phaser.Scene {
       frameHeight: 681,
     });
 
-    this.load.image("winGame", "../assets/scene2/winGame.png"); // carrega a imagem de vitória
-    this.load.image("loseGame", "../assets/scene2/loseGame.png"); // carrega a imagem de derrrota
-    this.load.image("restartBtn", "../assets/scene2/restartBtn.png"); // botão de reiniciar jogo
+    this.load.image("winGame", "assets/scene2/winGame.png"); // carrega a imagem de vitória
+    this.load.image("loseGame", "assets/scene2/loseGame.png"); // carrega a imagem de derrrota
+    this.load.image("restartBtn", "assets/scene2/restartBtn.png"); // botão de reiniciar jogo
 
-    this.load.image("grass", "../assets/scene2/wizardMap/grass.png"); // imagem para contruir a chão do jogo
-    this.load.image("water", "../assets/scene2/wizardMap/water.png"); // imagem para contruir a borda do jogo
-    this.load.image("flora", "../assets/scene2/wizardMap/flora.png"); // imagem para contruir a decoração do jogo
-    this.load.tilemapTiledJSON("map", "../assets/scene2/wizardMap/map.json"); // json com informações sobre a construção do mapa
+    this.load.image("grass", "assets/scene2/wizardMap/grass.png"); // imagem para contruir a chão do jogo
+    this.load.image("water", "assets/scene2/wizardMap/water.png"); // imagem para contruir a borda do jogo
+    this.load.image("flora", "assets/scene2/wizardMap/flora.png"); // imagem para contruir a decoração do jogo
+    this.load.tilemapTiledJSON("map", "assets/scene2/wizardMap/map.json"); // json com informações sobre a construção do mapa
   }
 
   create() {
@@ -450,7 +450,7 @@ class GamePlay extends Phaser.Scene {
     ) {// verifica se animação está sendo executada
       this.wizard.setOffset(20, 55);
       this.wizard.once(
-        Phaser.Animations.Events.ANIMATION_COMPLETE,// quando a animação forcompletada, execute uma função
+        Phaser.Animations.Events.ANIMATION_COMPLETE,// quando a animação for completada, execute uma função
         () => {
           this.wizard.setOffset(20, 8);
           this.isCollecting = false;

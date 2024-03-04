@@ -4,7 +4,7 @@ In the game O Conto do Mago, you take on the role of a wizard in a fantastical s
 
 ## 🔗 Play now!
 
-[Link do jogo](https://thiagomes07.github.io/theWizardsTale/)
+[Access the game from this link](https://thiagomes07.github.io/theWizardsTale/)
 
 ## 🌐 Demonstration
 
